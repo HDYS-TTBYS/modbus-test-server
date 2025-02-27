@@ -16,8 +16,8 @@ const (
 type exampleHandler struct {
 	lock sync.RWMutex
 
-	coils            [16][3000]bool
-	discreteInputs   [16][3000]bool
+	coils            [16][2000]bool
+	discreteInputs   [16][2000]bool
 	holdingRegisters [16][1000]uint16
 	inputRegisters   [16][1000]uint16
 }
@@ -96,11 +96,6 @@ func (eh *exampleHandler) HandleCoils(req *modbus.CoilsRequest) (res []bool, err
 		err = modbus.ErrIllegalDataAddress
 		return
 	}
-	// レジスタの数が許可された範囲内であることを確認する
-	if req.Quantity > 125 || req.Quantity == 0 {
-		err = modbus.ErrIllegalDataValue
-		return nil, err
-	}
 
 	eh.lock.Lock()
 	defer eh.lock.Unlock()
@@ -137,11 +132,6 @@ func (eh *exampleHandler) HandleDiscreteInputs(req *modbus.DiscreteInputsRequest
 	if int(req.Addr)+int(req.Quantity) > len(eh.coils[req.UnitId-1]) {
 		err = modbus.ErrIllegalDataAddress
 		return
-	}
-	// レジスタの数が許可された範囲内であることを確認する
-	if req.Quantity > 125 || req.Quantity == 0 {
-		err = modbus.ErrIllegalDataValue
-		return nil, err
 	}
 
 	eh.lock.Lock()
@@ -182,11 +172,6 @@ func (eh *exampleHandler) HandleHoldingRegisters(req *modbus.HoldingRegistersReq
 	if int(req.Addr)+int(req.Quantity) > len(eh.holdingRegisters[req.UnitId-1])+len(eh.inputRegisters[req.UnitId-1]) {
 		err = modbus.ErrIllegalDataAddress
 		return
-	}
-	// レジスタの数が許可された範囲内であることを確認する
-	if req.Quantity > 125 || req.Quantity == 0 {
-		err = modbus.ErrIllegalDataValue
-		return nil, err
 	}
 
 	eh.lock.Lock()
@@ -232,12 +217,6 @@ func (eh *exampleHandler) HandleInputRegisters(req *modbus.InputRegistersRequest
 	// このリクエストでカバーされるすべてのレジスタが実際に存在することを確認する
 	if int(req.Addr)+int(req.Quantity) > len(eh.inputRegisters[req.UnitId-1]) {
 		err = modbus.ErrIllegalDataAddress
-		return nil, err
-	}
-
-	// レジスタの数が許可された範囲内であることを確認する
-	if req.Quantity > 125 || req.Quantity == 0 {
-		err = modbus.ErrIllegalDataValue
 		return nil, err
 	}
 
