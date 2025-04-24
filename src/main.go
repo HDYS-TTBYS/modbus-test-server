@@ -16,8 +16,8 @@ const (
 type exampleHandler struct {
 	lock sync.RWMutex
 
-	coils            [16][2000]bool
-	discreteInputs   [16][2000]bool
+	coils            [16][10000]bool
+	discreteInputs   [16][10000]bool
 	holdingRegisters [16][1000]uint16
 	inputRegisters   [16][1000]uint16
 }
